@@ -241,7 +241,10 @@ def test_source_asset_create_rejects_cross_project_dataset_assignment(client, se
         status="active",
         metadata_json={},
     )
-    db_session.add_all([other_project, other_dataset])
+    db_session.add(other_project)
+    db_session.flush()
+    db_session.add(other_dataset)
+    db_session.flush()
     db_session.commit()
 
     response = client.post(

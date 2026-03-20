@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from uuid import uuid4
 
-from sqlalchemy import DateTime, Enum, ForeignKey, Index, Integer, Numeric, String, UniqueConstraint, Uuid
+from sqlalchemy import DateTime, ForeignKey, Index, Integer, Numeric, String, UniqueConstraint, Uuid
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
-from app.db.types import json_type, utc_now
+from app.db.types import enum_value_type, json_type, utc_now
 from app.models.enums import AnnotationReviewDecision, AnnotationTaskStatus
 
 
@@ -24,7 +24,7 @@ class AnnotationTask(Base):
     source_asset_id: Mapped[str | None] = mapped_column(ForeignKey("source_assets.id"), nullable=True)
     task_type: Mapped[str] = mapped_column(String, nullable=False)
     status: Mapped[AnnotationTaskStatus] = mapped_column(
-        Enum(AnnotationTaskStatus, name="annotation_task_status", native_enum=False),
+        enum_value_type(AnnotationTaskStatus, name="annotation_task_status"),
         nullable=False,
     )
     priority: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
@@ -73,7 +73,7 @@ class AnnotationReview(Base):
     revision_id: Mapped[str] = mapped_column(ForeignKey("annotation_revisions.id"), nullable=False)
     reviewed_by_user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), nullable=False)
     decision: Mapped[AnnotationReviewDecision] = mapped_column(
-        Enum(AnnotationReviewDecision, name="annotation_review_decision", native_enum=False),
+        enum_value_type(AnnotationReviewDecision, name="annotation_review_decision"),
         nullable=False,
     )
     notes: Mapped[str | None] = mapped_column(String, nullable=True)

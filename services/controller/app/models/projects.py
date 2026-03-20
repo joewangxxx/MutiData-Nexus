@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from uuid import uuid4
 
-from sqlalchemy import DateTime, Enum, ForeignKey, Integer, Numeric, String, UniqueConstraint, Uuid
+from sqlalchemy import DateTime, ForeignKey, Integer, Numeric, String, UniqueConstraint, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.db.types import json_type, utc_now
+from app.db.types import enum_value_type, json_type, utc_now
 from app.models.enums import AssetKind, DatasetStatus, ProjectRole, ProjectStatus
 
 
@@ -20,7 +20,7 @@ class Project(Base):
     name: Mapped[str] = mapped_column(String, nullable=False)
     description: Mapped[str | None] = mapped_column(String, nullable=True)
     status: Mapped[ProjectStatus] = mapped_column(
-        Enum(ProjectStatus, name="project_status", native_enum=False), nullable=False
+        enum_value_type(ProjectStatus, name="project_status"), nullable=False
     )
     owner_user_id: Mapped[str | None] = mapped_column(ForeignKey("users.id"), nullable=True)
     settings: Mapped[dict] = mapped_column(json_type, default=dict, nullable=False)
@@ -42,7 +42,7 @@ class ProjectMembership(Base):
     project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), nullable=False, index=True)
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
     project_role: Mapped[ProjectRole] = mapped_column(
-        Enum(ProjectRole, name="project_role", native_enum=False), nullable=False
+        enum_value_type(ProjectRole, name="project_role"), nullable=False
     )
     status: Mapped[str] = mapped_column(String, nullable=False)
     created_at: Mapped[object] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
@@ -63,7 +63,7 @@ class Dataset(Base):
     description: Mapped[str | None] = mapped_column(String, nullable=True)
     source_kind: Mapped[str] = mapped_column(String, nullable=False)
     status: Mapped[DatasetStatus] = mapped_column(
-        Enum(DatasetStatus, name="dataset_status", native_enum=False), nullable=False
+        enum_value_type(DatasetStatus, name="dataset_status"), nullable=False
     )
     metadata_json: Mapped[dict] = mapped_column("metadata", json_type, default=dict, nullable=False)
     created_at: Mapped[object] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
@@ -80,7 +80,7 @@ class SourceAsset(Base):
     project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), nullable=False, index=True)
     dataset_id: Mapped[str | None] = mapped_column(ForeignKey("datasets.id"), nullable=True, index=True)
     asset_kind: Mapped[AssetKind] = mapped_column(
-        Enum(AssetKind, name="asset_kind", native_enum=False), nullable=False
+        enum_value_type(AssetKind, name="asset_kind"), nullable=False
     )
     uri: Mapped[str] = mapped_column(String, nullable=False)
     storage_key: Mapped[str | None] = mapped_column(String, nullable=True)

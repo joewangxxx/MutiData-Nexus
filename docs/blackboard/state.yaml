@@ -3,7 +3,7 @@ updated_at: "2026-03-20"
 
 project:
   name: "MutiData-Nexus"
-  state: "release_execution_hold"
+  state: "release_execution_successful"
   goal: >
     Build one platform that integrates a multimodal data annotation workflow
     and a project risk monitoring workflow with a frontend dashboard, a backend
@@ -22,8 +22,8 @@ orchestrator:
     - "Child agents must report status changes through handoff messages."
 
 workflow:
-  phase: "release_spot_check_blocked_by_seed_data"
-  status: "release_execution_hold"
+  phase: "release_execution_successful"
+  status: "release_execution_successful"
   gates:
     prd_ready: true
     architecture_ready: true
@@ -93,6 +93,11 @@ workflow:
     - "Release spot check initially failed because the web runtime was not propagating authorization to controller SSR data fetches in the release stack."
     - "The SSR auth propagation blocker is now fixed and QA-verified through the server-only CONTROLLER_API_AUTH_TOKEN fallback in apps/web."
     - "Release execution remains on hold because the release PostgreSQL runtime has no seeded users, memberships, or projects, and /projects still uses mock-backed navigation that can point at project IDs missing from the release controller database."
+    - "Release Runtime Seed / Bootstrap Data is now QA-verified: release bootstrap seeds the minimal runtime surface, bootstrap exits 0 in the real compose stack, and the release PostgreSQL database contains the expected users, memberships, project, dataset, assets, annotation tasks, risk records, workflow artifacts, and audit events."
+    - "The seed/bootstrap blocker is now closed; the remaining Phase 5 blocker is the mock-backed /projects top-level page and its stale project navigation."
+    - "Projects Page Live Migration is now QA-verified: /projects reads the live controller project list, renders real project IDs, and no longer depends on mock-backed top-level navigation."
+    - "Phase 5 Business Surface Spot Check has now been rerun successfully in the release runtime: project page, member-management surface, catalog, annotation queue/task detail, risk dashboard/detail, and workflow runs list/detail all return 200 and map to the seeded Release 1 boundary."
+    - "Release execution is now successful for the approved Release 1 boundary on the current local release workstation."
   dependencies:
     fe:
       requires:
@@ -127,15 +132,15 @@ agents:
       - "docs/design-tokens.md"
       - "docs/information-architecture.md"
   fe:
-    status: "release_runtime_ssr_auth_fallback_verified"
+    status: "projects_page_live_migration_verified"
     retries_used: 0
     max_retries: 3
   be:
-    status: "risk_signal_capture_verified"
+    status: "release_runtime_seed_bootstrap_verified"
     retries_used: 0
     max_retries: 3
   qa:
-    status: "release_runtime_ssr_auth_fallback_verified"
+    status: "release_execution_successful"
     retries_used: 0
   general:
     status: "release_1_final_acceptance_verified"
@@ -189,7 +194,7 @@ documents:
   release_execution_checklist:
     path: "docs/release-execution-checklist.md"
     owner: "orchestrator"
-    status: "spot_check_blocked_by_seed_data"
+    status: "release_execution_successful"
   design_tokens:
     path: "docs/design-tokens.md"
     owner: "designer"
@@ -213,7 +218,7 @@ documents:
   qa_report:
     path: "docs/qa-report.md"
     owner: "qa"
-    status: "release_1_final_acceptance_verified"
+    status: "release_execution_successful"
   release_gate:
     path: "docs/release-gate.md"
     owner: "general"

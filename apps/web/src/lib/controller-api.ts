@@ -454,6 +454,19 @@ export async function getProject(projectId: string): Promise<ProjectSummary> {
   return normalizeProjectDetail(data);
 }
 
+function normalizeProjectList(data: unknown): ProjectSummary[] {
+  if (!Array.isArray(data)) {
+    return [];
+  }
+
+  return data.map((item) => normalizeProjectDetail(item));
+}
+
+export async function listVisibleProjects(): Promise<ProjectSummary[]> {
+  const data = await controllerRequest<unknown>("/projects");
+  return normalizeProjectList(data);
+}
+
 export async function listProjectMembers(
   projectId: string,
   context: RequestContext = {},

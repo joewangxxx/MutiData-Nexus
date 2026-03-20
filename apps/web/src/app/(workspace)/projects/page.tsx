@@ -4,7 +4,7 @@ import {
   SectionCard,
   StatusBadge,
 } from "@/components/ui/primitives";
-import { listVisibleProjects } from "@/lib/mock-adapters";
+import { listVisibleProjects } from "@/lib/controller-api";
 import { formatCount } from "@/lib/presenters";
 
 export default async function ProjectsPage() {

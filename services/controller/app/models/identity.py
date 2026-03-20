@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from uuid import uuid4
 
-from sqlalchemy import DateTime, Enum, ForeignKey, String, UniqueConstraint, Uuid
+from sqlalchemy import DateTime, ForeignKey, String, UniqueConstraint, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.db.types import utc_now
+from app.db.types import enum_value_type, utc_now
 from app.models.enums import MemberRole, OrganizationStatus, UserStatus
 
 
@@ -17,7 +17,7 @@ class Organization(Base):
     slug: Mapped[str] = mapped_column(String, unique=True, nullable=False)
     name: Mapped[str] = mapped_column(String, nullable=False)
     status: Mapped[OrganizationStatus] = mapped_column(
-        Enum(OrganizationStatus, name="organization_status", native_enum=False),
+        enum_value_type(OrganizationStatus, name="organization_status"),
         nullable=False,
     )
     created_at: Mapped[object] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
@@ -35,9 +35,7 @@ class User(Base):
     id: Mapped[str] = mapped_column(Uuid, primary_key=True)
     email: Mapped[str] = mapped_column(String, unique=True, nullable=False)
     display_name: Mapped[str] = mapped_column(String, nullable=False)
-    status: Mapped[UserStatus] = mapped_column(
-        Enum(UserStatus, name="user_status", native_enum=False), nullable=False
-    )
+    status: Mapped[UserStatus] = mapped_column(enum_value_type(UserStatus, name="user_status"), nullable=False)
     created_at: Mapped[object] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
     updated_at: Mapped[object] = mapped_column(
         DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False
@@ -57,7 +55,7 @@ class OrganizationMembership(Base):
     )
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
     role: Mapped[MemberRole] = mapped_column(
-        Enum(MemberRole, name="member_role", native_enum=False), nullable=False
+        enum_value_type(MemberRole, name="member_role"), nullable=False
     )
     status: Mapped[str] = mapped_column(String, nullable=False)
     created_at: Mapped[object] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)

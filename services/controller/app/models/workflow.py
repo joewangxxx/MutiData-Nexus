@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from uuid import uuid4
 
-from sqlalchemy import DateTime, Enum, ForeignKey, Index, Integer, String, UniqueConstraint, Uuid
+from sqlalchemy import DateTime, ForeignKey, Index, Integer, String, UniqueConstraint, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.db.types import json_type, utc_now
+from app.db.types import enum_value_type, json_type, utc_now
 from app.models.enums import AiResultStatus, AiResultType, CozeRunStatus, WorkflowDomain, WorkflowRunStatus, WorkflowStepStatus
 
 
@@ -22,13 +22,13 @@ class WorkflowRun(Base):
     organization_id: Mapped[str] = mapped_column(ForeignKey("organizations.id"), nullable=False, index=True)
     project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), nullable=False, index=True)
     workflow_domain: Mapped[WorkflowDomain] = mapped_column(
-        Enum(WorkflowDomain, name="workflow_domain", native_enum=False), nullable=False
+        enum_value_type(WorkflowDomain, name="workflow_domain"), nullable=False
     )
     workflow_type: Mapped[str] = mapped_column(String, nullable=False)
     source_entity_type: Mapped[str] = mapped_column(String, nullable=False)
     source_entity_id: Mapped[str] = mapped_column(Uuid, nullable=False)
     status: Mapped[WorkflowRunStatus] = mapped_column(
-        Enum(WorkflowRunStatus, name="workflow_run_status", native_enum=False), nullable=False
+        enum_value_type(WorkflowRunStatus, name="workflow_run_status"), nullable=False
     )
     priority: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     requested_by_user_id: Mapped[str | None] = mapped_column(ForeignKey("users.id"), nullable=True)
@@ -65,7 +65,7 @@ class WorkflowRunStep(Base):
     step_key: Mapped[str] = mapped_column(String, nullable=False)
     sequence_no: Mapped[int] = mapped_column(Integer, nullable=False)
     status: Mapped[WorkflowStepStatus] = mapped_column(
-        Enum(WorkflowStepStatus, name="workflow_step_status", native_enum=False), nullable=False
+        enum_value_type(WorkflowStepStatus, name="workflow_step_status"), nullable=False
     )
     attempt_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     input_payload: Mapped[dict] = mapped_column(json_type, default=dict, nullable=False)
@@ -94,7 +94,7 @@ class CozeRun(Base):
     step_id: Mapped[str | None] = mapped_column(ForeignKey("workflow_run_steps.id"), nullable=True)
     coze_workflow_key: Mapped[str] = mapped_column(String, nullable=False)
     status: Mapped[CozeRunStatus] = mapped_column(
-        Enum(CozeRunStatus, name="coze_run_status", native_enum=False), nullable=False
+        enum_value_type(CozeRunStatus, name="coze_run_status"), nullable=False
     )
     idempotency_key: Mapped[str] = mapped_column(String, nullable=False)
     external_run_id: Mapped[str | None] = mapped_column(String, nullable=True)
@@ -125,10 +125,10 @@ class AiResult(Base):
     workflow_run_id: Mapped[str] = mapped_column(ForeignKey("workflow_runs.id"), nullable=False, index=True)
     coze_run_id: Mapped[str | None] = mapped_column(ForeignKey("coze_runs.id"), nullable=True)
     result_type: Mapped[AiResultType] = mapped_column(
-        Enum(AiResultType, name="ai_result_type", native_enum=False), nullable=False
+        enum_value_type(AiResultType, name="ai_result_type"), nullable=False
     )
     status: Mapped[AiResultStatus] = mapped_column(
-        Enum(AiResultStatus, name="ai_result_status", native_enum=False), nullable=False
+        enum_value_type(AiResultStatus, name="ai_result_status"), nullable=False
     )
     source_entity_type: Mapped[str] = mapped_column(String, nullable=False)
     source_entity_id: Mapped[str] = mapped_column(Uuid, nullable=False)

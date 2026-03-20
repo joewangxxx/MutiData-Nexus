@@ -2,9 +2,12 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from sqlalchemy import select, func
+from sqlalchemy import Enum as SqlEnum
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from app.db.types import enum_value_type
+from app.models.enums import AnnotationTaskStatus, WorkflowRunStatus
 from app.models.annotation import AnnotationTask
 from app.models.audit import AuditEvent
 from app.models.identity import Organization, OrganizationMembership, User
@@ -119,3 +122,12 @@ def test_release_bootstrap_is_idempotent_and_supports_spot_check_surfaces(
     assert workflow_runs_response.status_code == 200
     assert len(workflow_runs_response.json()["data"]) == 2
 
+
+def test_enum_value_type_persists_lowercase_values() -> None:
+    annotation_enum = enum_value_type(AnnotationTaskStatus, name="annotation_task_status")
+    workflow_enum = enum_value_type(WorkflowRunStatus, name="workflow_run_status")
+
+    assert isinstance(annotation_enum, SqlEnum)
+    assert annotation_enum.bind_processor(None)(AnnotationTaskStatus.QUEUED) == "queued"
+    assert annotation_enum.bind_processor(None)("queued") == "queued"
+    assert workflow_enum.bind_processor(None)(WorkflowRunStatus.RUNNING) == "running"

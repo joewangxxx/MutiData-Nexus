@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from uuid import uuid4
 
-from sqlalchemy import DateTime, Enum, ForeignKey, Index, String, Uuid
+from sqlalchemy import DateTime, ForeignKey, Index, String, Uuid
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
-from app.db.types import json_type, utc_now
+from app.db.types import enum_value_type, json_type, utc_now
 from app.models.enums import AuditAction
 
 
@@ -22,7 +22,7 @@ class AuditEvent(Base):
     project_id: Mapped[str | None] = mapped_column(ForeignKey("projects.id"), nullable=True, index=True)
     actor_user_id: Mapped[str | None] = mapped_column(ForeignKey("users.id"), nullable=True)
     action: Mapped[AuditAction] = mapped_column(
-        Enum(AuditAction, name="audit_action", native_enum=False), nullable=False
+        enum_value_type(AuditAction, name="audit_action"), nullable=False
     )
     reason_code: Mapped[str] = mapped_column(String, nullable=False)
     entity_type: Mapped[str] = mapped_column(String, nullable=False)

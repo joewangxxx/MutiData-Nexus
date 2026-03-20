@@ -148,7 +148,9 @@ def test_project_catalog_endpoints_enforce_project_visibility(
         checksum="checksum-private",
         metadata_json={},
     )
-    db_session.add_all([private_project, private_dataset, private_asset])
+    db_session.add(private_project)
+    db_session.flush()
+    db_session.add_all([private_dataset, private_asset])
     db_session.commit()
 
     annotator_headers = {"Authorization": f"Bearer {seeded_context['annotator_user_id']}"}

@@ -8,7 +8,7 @@ from uuid import uuid4
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
@@ -37,6 +37,13 @@ def db_session() -> Session:
         connect_args={"check_same_thread": False},
         poolclass=StaticPool,
     )
+
+    @event.listens_for(engine, "connect")
+    def set_sqlite_pragma(dbapi_connection, _connection_record):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
+
     TestingSessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, future=True)
     Base.metadata.create_all(bind=engine)
 
@@ -161,6 +168,7 @@ def seeded_context(db_session: Session) -> dict[str, str]:
             status="active",
         )
     )
+    db_session.flush()
 
     dataset = Dataset(
         id=uuid4(),
@@ -294,12 +302,10 @@ def seeded_context(db_session: Session) -> dict[str, str]:
         input_snapshot={"task_type": "image_labeling"},
         result_summary={},
     )
+    db_session.add_all([dataset, image_source_asset, audio_source_asset, video_source_asset])
+    db_session.flush()
     db_session.add_all(
         [
-            dataset,
-            image_source_asset,
-            audio_source_asset,
-            video_source_asset,
             image_annotation_task,
             submission_task,
             audio_annotation_task,
@@ -320,6 +326,8 @@ def seeded_context(db_session: Session) -> dict[str, str]:
         input_payload={"task_id": str(image_annotation_task.id)},
         output_payload={},
     )
+    db_session.add(workflow_step)
+    db_session.flush()
     coze_run = CozeRun(
         id=uuid4(),
         workflow_run_id=workflow_run.id,
@@ -333,6 +341,8 @@ def seeded_context(db_session: Session) -> dict[str, str]:
         response_payload={},
         callback_payload={},
     )
+    db_session.add(coze_run)
+    db_session.flush()
     ai_result = AiResult(
         id=uuid4(),
         organization_id=organization.id,
@@ -361,7 +371,7 @@ def seeded_context(db_session: Session) -> dict[str, str]:
         metadata_json={"source": "tests"},
     )
 
-    db_session.add_all([workflow_step, coze_run, ai_result, audit_event])
+    db_session.add_all([ai_result, audit_event])
     db_session.commit()
 
     return {

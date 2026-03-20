@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from uuid import uuid4
 
-from sqlalchemy import DateTime, Enum, ForeignKey, Index, Integer, String, Uuid
+from sqlalchemy import DateTime, ForeignKey, Index, Integer, String, Uuid
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
-from app.db.types import json_type, utc_now
+from app.db.types import enum_value_type, json_type, utc_now
 from app.models.enums import RiskAlertStatus, RiskSignalStatus, StrategyStatus
 
 
@@ -19,7 +19,7 @@ class RiskSignal(Base):
     signal_type: Mapped[str] = mapped_column(String, nullable=False)
     severity: Mapped[int] = mapped_column(Integer, nullable=False)
     status: Mapped[RiskSignalStatus] = mapped_column(
-        Enum(RiskSignalStatus, name="risk_signal_status", native_enum=False), nullable=False
+        enum_value_type(RiskSignalStatus, name="risk_signal_status"), nullable=False
     )
     title: Mapped[str] = mapped_column(String, nullable=False)
     description: Mapped[str | None] = mapped_column(String, nullable=True)
@@ -43,7 +43,7 @@ class RiskAlert(Base):
     project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), nullable=False, index=True)
     risk_signal_id: Mapped[str | None] = mapped_column(ForeignKey("risk_signals.id"), nullable=True)
     status: Mapped[RiskAlertStatus] = mapped_column(
-        Enum(RiskAlertStatus, name="risk_alert_status", native_enum=False), nullable=False
+        enum_value_type(RiskAlertStatus, name="risk_alert_status"), nullable=False
     )
     severity: Mapped[int] = mapped_column(Integer, nullable=False)
     title: Mapped[str] = mapped_column(String, nullable=False)
@@ -68,7 +68,7 @@ class RiskStrategy(Base):
     risk_alert_id: Mapped[str] = mapped_column(ForeignKey("risk_alerts.id"), nullable=False, index=True)
     source_ai_result_id: Mapped[str | None] = mapped_column(ForeignKey("ai_results.id"), nullable=True)
     status: Mapped[StrategyStatus] = mapped_column(
-        Enum(StrategyStatus, name="strategy_status", native_enum=False), nullable=False
+        enum_value_type(StrategyStatus, name="strategy_status"), nullable=False
     )
     proposal_order: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     title: Mapped[str] = mapped_column(String, nullable=False)

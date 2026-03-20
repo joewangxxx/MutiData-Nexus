@@ -592,6 +592,37 @@ Residual risk:
 - The form is intentionally narrow and does not attempt to cover the nearby strategy approval or alert management surfaces.
 - The analyze path still depends on the backend-owned risk workflow, so any provider/runtime issue would surface there rather than in the form itself.
 
+## Slice Check: Projects Page Live Migration
+
+This targeted check validates only the release-blocker fix for the top-level projects page:
+
+- `/projects` reads the live controller-backed project list
+- top-level project cards render the live `ATLAS` project from the release runtime seed data
+- project navigation links resolve to the real project detail, annotation queue, and risk dashboard routes
+- release runtime pages for project detail, annotation queue, risk dashboard, workflow runs list, and workflow run detail load without mock-adapter dependence
+
+Result:
+
+- Passed
+
+Evidence:
+
+- `apps/web/src/app/(workspace)/projects/page.tsx` now imports `listVisibleProjects()` from `apps/web/src/lib/controller-api.ts` instead of `listVisibleProjects` from `apps/web/src/lib/mock-adapters.ts`.
+- `apps/web/src/lib/controller-api.ts` now exposes `listVisibleProjects()` as a controller-backed `GET /api/v1/projects` helper.
+- `apps/web/src/app/(workspace)/projects/page.test.tsx` verifies the page renders a controller-backed project card and emits the expected project detail, annotation queue, and risk dashboard links.
+- Live release runtime checks returned `200` for:
+  - `/projects`
+  - `/projects/00000000-0000-0000-0000-000000002001`
+  - `/projects/00000000-0000-0000-0000-000000002001/annotation/queue`
+  - `/projects/00000000-0000-0000-0000-000000002001/risk`
+  - `/workflow-runs`
+  - `/workflow-runs/00000000-0000-0000-0000-000000009001`
+- Release HTML inspection confirmed the projects page contains the live `ATLAS` project card and the three navigation links, with no mock-adapters reference in the rendered output.
+
+Residual risk:
+
+- The page is intentionally thin and still depends on controller-backed project list availability at runtime, which is now satisfied by the release seed/bootstrap data.
+
 ## Environment
 
 - Workspace: `C:\Users\JoeWang\Desktop\MutiData-Nexus`

@@ -79,6 +79,53 @@ describe("controller api helpers", () => {
     expect(headers.get("x-request-id")).toBe("req-no-auth");
   });
 
+  it("lists visible projects from the live controller endpoint", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          data: [
+            {
+              id: "proj_1",
+              organization_id: "org_1",
+              code: "P-1",
+              name: "Project One",
+              description: "Live project",
+              status: "active",
+              owner_user_id: "user_1",
+              settings: {},
+              counts: {
+                annotation_queue: 4,
+                risk_queue: 2,
+                active_workflow_runs: 1,
+                waiting_for_human_runs: 1,
+              },
+            },
+          ],
+          meta: {
+            request_id: "req_projects",
+            next_cursor: null,
+            has_more: false,
+          },
+        }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      ),
+    );
+
+    vi.stubGlobal("fetch", fetchMock);
+
+    const { listVisibleProjects } = await import("./controller-api");
+    const projects = await listVisibleProjects();
+
+    expect(projects).toHaveLength(1);
+    expect(projects[0].id).toBe("proj_1");
+    expect(fetchMock).toHaveBeenCalledWith(
+      "http://backend.test/api/v1/projects",
+      expect.objectContaining({
+        cache: "no-store",
+      }),
+    );
+  });
+
   it("prefers the incoming authorization header over the server runtime auth token", async () => {
     process.env.CONTROLLER_API_AUTH_TOKEN = "00000000-0000-0000-0000-000000000321";
 

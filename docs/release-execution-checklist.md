@@ -1,6 +1,6 @@
 # Release Execution Checklist
 
-Status: `spot_check_blocked_by_seed_data`
+Status: `release_execution_successful`
 Owner: `orchestrator`
 Last Updated: `2026-03-20`
 
@@ -8,9 +8,9 @@ This checklist is the parent-thread execution runbook for the approved Release 1
 
 ## Current Execution Outcome
 
-Current status: `HOLD`
+Current status: `GO`
 
-Preflight, release build, and smoke validation were executed on `2026-03-20` and completed successfully for the current release workstation, but the formal business-surface spot check remains held behind release-runtime data readiness.
+Preflight, release build, smoke validation, and the rerun of Phase 5 business-surface checks all completed successfully on `2026-03-20` for the current release workstation. The release stack now includes real bootstrap data, the `/projects` surface is live controller-backed, and the approved Release 1 boundary is usable in the deployed release runtime.
 
 Resolved findings:
 
@@ -21,10 +21,9 @@ Resolved findings:
 
 Next action:
 
-- Hold the current release execution.
-- Treat release-runtime seed/bootstrap data and residual mock-backed project navigation as the current blocking issues.
-- Route the next blocker through the Orchestrator before rerunning Phase 5.
-- Do not declare release execution successful until the affected pages pass a rerun of Phase 5 with real release-runtime data.
+- Record this execution as the current successful local Release 1 run.
+- Keep the release evidence bundle with the updated smoke and spot-check outputs.
+- If another release attempt is needed later, start again from Phase 1 with a fresh operator timestamp.
 
 ## Scope Guard
 
@@ -57,11 +56,11 @@ All of the following must be true before execution starts:
 
 ## Phase 1: Freeze
 
-- [ ] Freeze the approved Release 1 boundary and stop accepting scope changes
-- [ ] Record the intended release timestamp and operator
+- [x] Freeze the approved Release 1 boundary and stop accepting scope changes
+- [x] Record the intended release timestamp and operator
 - [x] Confirm the release environment variables are prepared from [release.env.example](C:/Users/JoeWang/Desktop/MutiData-Nexus/ops/release/release.env.example)
 - [x] Confirm Docker daemon access on the target release workstation
-- [ ] Confirm the release artifact versions or image tags to deploy
+- [x] Confirm the release artifact versions or image tags to deploy
 
 ## Phase 2: Preflight
 
@@ -93,20 +92,20 @@ All of the following must be true before execution starts:
 
 Run only boundary checks that map to the verified Release 1 slices:
 
-- [ ] Project page loads
-- [ ] Project member management surface loads
+- [x] Project page loads
+- [x] Project member management surface loads
 - [x] Project catalog surface loads
-- [ ] Annotation queue and task detail load
-- [ ] Risk dashboard and risk detail load
-- [ ] Workflow runs list and detail load
+- [x] Annotation queue and task detail load
+- [x] Risk dashboard and risk detail load
+- [x] Workflow runs list and detail load
 
 Do not widen this phase into a full regression suite. If any of these checks fail, stop and route the issue back through the Orchestrator.
 
 ## Phase 6: Go / Hold Decision
 
-- [ ] If all checks pass, mark release execution as successful
-- [x] If any blocking check fails, mark release execution as held
-- [x] If held, capture the failure point, impacted surface, and first owner to engage
+- [x] If all checks pass, mark release execution as successful
+- [ ] If any blocking check fails, mark release execution as held
+- [ ] If held, capture the failure point, impacted surface, and first owner to engage
 
 ## Rollback Trigger
 
@@ -128,12 +127,12 @@ Rollback is required if any of the following happens after the release build ste
 
 Release execution is complete only when all of the following are true:
 
-- [ ] Release build completed
-- [ ] Smoke validation passed
-- [ ] Boundary spot checks passed
-- [ ] No rollback was required
-- [ ] Blackboard state has been updated by the parent thread
-- [ ] Release-facing docs still match the deployed boundary
+- [x] Release build completed
+- [x] Smoke validation passed
+- [x] Boundary spot checks passed
+- [x] No rollback was required
+- [x] Blackboard state has been updated by the parent thread
+- [x] Release-facing docs still match the deployed boundary
 
 ## Evidence To Capture
 
@@ -165,35 +164,15 @@ Release execution is complete only when all of the following are true:
 
 ## Current Spot Check Evidence
 
-- `http://127.0.0.1:13000/projects/proj_atlas` returned `500`.
-- `http://127.0.0.1:13000/projects/proj_atlas/catalog` returned `200`.
-- `http://127.0.0.1:13000/projects/proj_atlas/annotation/queue` returned `200`, but release logs show server-side controller fetches failing with `401 unauthorized`.
-- `http://127.0.0.1:13000/projects/proj_atlas/risk` returned `200`, but release logs show server-side controller fetches failing with `401 unauthorized`.
-- `http://127.0.0.1:13000/workflow-runs` returned `500`.
-- `mutidata-nexus-web-1` logs show `ControllerApiError: Authorization header is required.`
-- `mutidata-nexus-controller-1` logs show `401 Unauthorized` for release-runtime requests such as:
-  - `GET /api/v1/projects/proj_atlas`
-  - `GET /api/v1/projects/proj_atlas/annotation-tasks`
-  - `GET /api/v1/projects/proj_atlas/risk-alerts`
-  - `GET /api/v1/projects/proj_atlas/members`
-  - `GET /api/v1/workflow-runs`
-- After the SSR auth fallback fix was applied and the release web container was rebuilt with `CONTROLLER_API_AUTH_TOKEN`, the web log changed from `Authorization header is required.` to `Authenticated user is not active.` for `/projects/proj_atlas`.
-- The release PostgreSQL instance still reports `0` rows in `users`, `project_memberships`, and `projects`.
-- `/projects` still renders from `apps/web/src/lib/mock-adapters.ts`, so release navigation can point at project IDs that do not exist in the release controller database.
+- `http://127.0.0.1:13000/projects` returned `200` and rendered the live `ATLAS` project card with real project links.
+- `http://127.0.0.1:13000/projects/00000000-0000-0000-0000-000000002001` returned `200` and exposed the project member-management surface.
+- `http://127.0.0.1:13000/projects/00000000-0000-0000-0000-000000002001/catalog` returned `200` and rendered the seeded dataset and multimodal assets.
+- `http://127.0.0.1:13000/projects/00000000-0000-0000-0000-000000002001/annotation/queue` returned `200`, and the seeded annotation queue plus task detail route are reachable in the release runtime.
+- `http://127.0.0.1:13000/projects/00000000-0000-0000-0000-000000002001/risk` and `.../risk/00000000-0000-0000-0000-000000007001` both returned `200`.
+- `http://127.0.0.1:13000/workflow-runs` and `.../workflow-runs/00000000-0000-0000-0000-000000009001` both returned `200`.
+- Release bootstrap now returns a `bootstrapped` manifest and the release PostgreSQL database contains the expected counts for users, memberships, project, dataset, assets, annotation tasks, risk records, workflow records, Coze runs, AI results, and audit events.
+- After the `/projects` live migration, the release runtime no longer depends on `mock-adapters` for top-level project navigation.
 
 ## Blocking Release Issue
 
-Release-runtime business pages are still not consistently usable, but the blocking cause has moved. The SSR auth-propagation bug is fixed; the current blockers are missing release-runtime seed/bootstrap data and residual mock-backed project navigation.
-
-Impacted surfaces:
-
-- Project overview
-- Project member management surface
-- Annotation queue and downstream task-detail path
-- Risk dashboard and downstream risk-detail path
-- Workflow runs list and downstream detail path
-
-Requested next owners:
-
-- `be`
-- `fe`
+No blocking release issue remains for the approved Release 1 boundary in the current local release-runtime execution.

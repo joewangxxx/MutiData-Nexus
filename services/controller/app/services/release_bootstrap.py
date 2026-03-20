@@ -180,6 +180,7 @@ def seed_release_runtime_data(session: Session, *, controller_user_id: UUID) -> 
             "status": "active",
         },
     )
+    session.flush()
 
     dataset = _upsert(
         session,
@@ -255,6 +256,78 @@ def seed_release_runtime_data(session: Session, *, controller_user_id: UUID) -> 
             "metadata_json": {"bootstrap": True},
         },
     )
+    session.flush()
+
+    _upsert(
+        session,
+        WorkflowRun,
+        ANNOTATION_RUN_ID,
+        {
+            "organization_id": organization.id,
+            "project_id": project.id,
+            "workflow_domain": WorkflowDomain.ANNOTATION,
+            "workflow_type": "annotation_assist",
+            "source_entity_type": "annotation_task",
+            "source_entity_id": IMAGE_TASK_ID,
+            "status": WorkflowRunStatus.WAITING_FOR_HUMAN,
+            "priority": 90,
+            "requested_by_user_id": controller_user.id,
+            "source": "bootstrap",
+            "correlation_key": "release-bootstrap-annotation",
+            "idempotency_key": "release-bootstrap-annotation",
+            "input_snapshot": {},
+            "result_summary": {},
+            "error_code": None,
+            "error_message": None,
+            "started_at": _at(0),
+            "completed_at": None,
+            "canceled_at": None,
+        },
+    )
+    _upsert(
+        session,
+        AiResult,
+        ANNOTATION_RESULT_ID,
+        {
+            "organization_id": organization.id,
+            "project_id": project.id,
+            "workflow_run_id": ANNOTATION_RUN_ID,
+            "coze_run_id": None,
+            "result_type": AiResultType.ANNOTATION_SUGGESTION,
+            "status": AiResultStatus.GENERATED,
+            "source_entity_type": "annotation_task",
+            "source_entity_id": IMAGE_TASK_ID,
+            "raw_payload": {},
+            "normalized_payload": {},
+        },
+    )
+    _upsert(
+        session,
+        WorkflowRun,
+        RISK_RUN_ID,
+        {
+            "organization_id": organization.id,
+            "project_id": project.id,
+            "workflow_domain": WorkflowDomain.RISK_MONITORING,
+            "workflow_type": "risk_monitoring",
+            "source_entity_type": "risk_signal",
+            "source_entity_id": RISK_SIGNAL_ID,
+            "status": WorkflowRunStatus.WAITING_FOR_HUMAN,
+            "priority": 85,
+            "requested_by_user_id": controller_user.id,
+            "source": "bootstrap",
+            "correlation_key": "release-bootstrap-risk",
+            "idempotency_key": "release-bootstrap-risk",
+            "input_snapshot": {},
+            "result_summary": {},
+            "error_code": None,
+            "error_message": None,
+            "started_at": _at(30),
+            "completed_at": None,
+            "canceled_at": None,
+        },
+    )
+    session.flush()
 
     image_task = _upsert(
         session,
@@ -382,6 +455,7 @@ def seed_release_runtime_data(session: Session, *, controller_user_id: UUID) -> 
             "created_by_user_id": controller_user.id,
         },
     )
+    session.flush()
     risk_alert = _upsert(
         session,
         RiskAlert,
@@ -480,6 +554,7 @@ def seed_release_runtime_data(session: Session, *, controller_user_id: UUID) -> 
             "completed_at": None,
         },
     )
+    session.flush()
     _upsert(
         session,
         CozeRun,
@@ -502,6 +577,7 @@ def seed_release_runtime_data(session: Session, *, controller_user_id: UUID) -> 
             "last_polled_at": _at(3),
         },
     )
+    session.flush()
     _upsert(
         session,
         AiResult,
@@ -582,6 +658,7 @@ def seed_release_runtime_data(session: Session, *, controller_user_id: UUID) -> 
             "completed_at": None,
         },
     )
+    session.flush()
     _upsert(
         session,
         CozeRun,
@@ -604,6 +681,7 @@ def seed_release_runtime_data(session: Session, *, controller_user_id: UUID) -> 
             "last_polled_at": _at(33),
         },
     )
+    session.flush()
     risk_result = _upsert(
         session,
         AiResult,
@@ -621,6 +699,7 @@ def seed_release_runtime_data(session: Session, *, controller_user_id: UUID) -> 
             "normalized_payload": {"summary": "Two viable mitigation paths generated for backlog pressure."},
         },
     )
+    session.flush()
     _upsert(
         session,
         RiskStrategy,
@@ -657,6 +736,7 @@ def seed_release_runtime_data(session: Session, *, controller_user_id: UUID) -> 
             "applied_at": None,
         },
     )
+    session.flush()
 
     _upsert(
         session,
