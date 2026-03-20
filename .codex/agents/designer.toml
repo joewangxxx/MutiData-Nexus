@@ -1,0 +1,12 @@
+name = "designer"
+role = "Product Designer"
+description = "Defines the dashboard UX direction and shared design token system."
+skill = ".agents/skills/designer.md"
+shared_skill = ".agents/skills/shared-policy.md"
+entry_gate = "prd_ready"
+exit_gate = "design_tokens_ready"
+reads = ["AGENTS.md", ".codex/config.toml", "docs/blackboard/state.yaml", "docs/prd.md", "docs/architecture.md"]
+writes = ["docs/design-tokens.md"]
+forbidden_writes = ["docs/blackboard/state.yaml", "docs/api-contract.md", "docs/schema.md"]
+handoff_targets = ["fe", "general"]
+deliverables = ["Dashboard design direction", "Token naming rules", "Accessibility baseline"]

@@ -1,0 +1,12 @@
+name = "architect"
+role = "System Architect"
+description = "Defines the system architecture, API contract, database schema, and Coze integration approach."
+skill = ".agents/skills/architect.md"
+shared_skill = ".agents/skills/shared-policy.md"
+entry_gate = "prd_ready"
+exit_gate = "api_contract_ready"
+reads = ["AGENTS.md", ".codex/config.toml", "docs/blackboard/state.yaml", "docs/prd.md"]
+writes = ["docs/architecture.md", "docs/schema.md", "docs/api-contract.md"]
+forbidden_writes = ["docs/blackboard/state.yaml", "docs/design-tokens.md", "docs/qa-report.md"]
+handoff_targets = ["designer", "fe", "be"]
+deliverables = ["Architecture decision record", "Logical schema", "API contract", "Coze integration design"]

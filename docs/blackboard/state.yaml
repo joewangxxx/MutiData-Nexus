@@ -1,0 +1,252 @@
+version: 1
+updated_at: "2026-03-20"
+
+project:
+  name: "MutiData-Nexus"
+  state: "release_execution_hold"
+  goal: >
+    Build one platform that integrates a multimodal data annotation workflow
+    and a project risk monitoring workflow with a frontend dashboard, a backend
+    controller service, PostgreSQL as the source of truth, and Coze API as the
+    AI execution engine.
+  detected_repository_stack:
+    application_code: "Next.js frontend foundation in apps/web and FastAPI backend foundation in services/controller"
+    infrastructure_code: "Alembic baseline in db with PostgreSQL-oriented schema migration"
+    repository_status: "design-approved workspace with verified annotation, risk, and review slices implemented"
+
+orchestrator:
+  owner: "parent-thread"
+  blackboard_writer: true
+  notes:
+    - "Only the parent thread updates this file."
+    - "Child agents must report status changes through handoff messages."
+
+workflow:
+  phase: "release_spot_check_blocked_by_seed_data"
+  status: "release_execution_hold"
+  gates:
+    prd_ready: true
+    architecture_ready: true
+    schema_ready: true
+    api_contract_ready: true
+    design_tokens_ready: true
+    fe_be_parallel_enabled: true
+    implementation_complete: true
+    qa_passed: true
+    release_ready: true
+  notes:
+    - "PM, architect, and designer deliverables were reviewed and approved by the Orchestrator."
+    - "Implementation may proceed in parallel for FE and BE against the frozen v1 contract."
+    - "FE and BE must escalate contract changes; they may not modify docs/api-contract.md directly."
+    - "Frontend and backend foundation slices are implemented and verified locally."
+    - "This historical foundation-milestone note was superseded by later verified slices and the Release 1 final acceptance gate."
+    - "QA found follow-up issues on PostgreSQL runtime alignment, backend error-code mapping, and frontend numeric contract typing."
+    - "The QA fix round resolved the foundation-level runtime and contract alignment issues."
+    - "PM accepted the current work as a verified foundation milestone for the next implementation phase, not as MVP acceptance."
+    - "General documentation now reflects the verified foundation milestone and remaining gaps."
+    - "The approved AI-Assisted Annotation Submission slice is now implemented and QA-verified end to end."
+    - "This slice includes the live annotation queue, task detail, AI generate action, callback persistence, revision submission, workflow drilldown, source asset read path, and audit writes."
+    - "This historical MVP-gap note was superseded once risk monitoring, workflow visibility, and the remaining approved Release 1 slices were verified."
+    - "The approved Project Risk Monitoring E2E slice is now implemented and QA-verified end to end."
+    - "This slice uses risk signals as event inputs, risk alerts as persisted current risk snapshots, and risk strategies as persisted mitigation suggestions."
+    - "Project page risk posture, risk dashboard, risk item detail, strategy generation, and workflow detail now read the same backend-owned risk facts."
+    - "The annotation review flow is now implemented and QA-verified, including reviewer decisions, task/workflow status transitions, audit persistence, and resubmission guardrails for closed tasks."
+    - "The annotation Coze integration now uses a backend-owned gateway with environment-based Coze config, synchronous AI result persistence, workflow/coze run tracking, and annotation callback path reuse."
+    - "The risk workflow now uses a backend-owned gateway on POST /api/v1/projects/{project_id}/risk-generate with environment-based Coze config, workflow/coze run tracking, synchronous persistence, and accepted-to-callback completion support."
+    - "Architect clarified the risk domain to use one physical Coze risk workflow that returns both risk analysis and strategy suggestions."
+    - "POST /api/v1/projects/{project_id}/risk-generate is now the only real risk-domain Coze dispatch entry for MVP, and it maps platform state into the provider's project-risk payload shape."
+    - "Unified risk workflow completion now persists risk analysis, strategy suggestions, risk alerts, risk strategies, and audit events through one shared closure path."
+    - "POST /api/v1/risk-alerts/{alert_id}/strategy-generate is now a deferred/unsupported MVP surface and must not dispatch Coze."
+    - "The risk detail frontend no longer exposes the deprecated generate button and now explains that strategy suggestions appear after the project risk workflow runs."
+    - "Risk strategy approve/reject is now implemented and QA-verified, including proposed-only decision buttons, backend approve/reject endpoints, idempotent decision replay, and audit persistence."
+    - "The /workflow-runs list page is now live-backed, uses the controller workflow list endpoint, preserves the four summary metrics, and keeps drilldown links into /workflow-runs/{run_id}."
+    - "This historical implementation-gap note was superseded by the Release 1 final acceptance gate; the approved Release 1 boundary is now implemented."
+    - "PM has reframed docs/mvp-scope.md as the Release 1 boundary document with explicit must-have gates, verified completes, blockers, and allowed deferrals."
+    - "QA has converted docs/qa-report.md into the Release 1 final acceptance framing and now supports the approved release boundary."
+    - "General has aligned docs/release-gate.md, docs/release.md, and docs/handoff.md to the approved GO decision for the verified Release 1 boundary."
+    - "Project Dataset & Asset Catalog E2E is now implemented with live datasets and source-assets catalog APIs plus a project-scoped catalog page."
+    - "The new catalog slice uses existing Dataset and SourceAsset tables, adds backend-owned source-asset access envelopes, and keeps the frontend controller-backed only."
+    - "QA for the catalog slice was temporarily blocked by infrastructure and sandbox limits, but the Orchestrator restored the path by rerunning the blocked frontend vitest and build commands with approval outside the sandbox."
+    - "Project Dataset & Asset Catalog E2E is now QA-verified as a read-only, live, backend-owned catalog slice covering datasets, multimodal source assets, access envelopes, and project overview entry navigation."
+    - "Annotation Task Management Completion is now QA-verified with backend-owned create, claim, and patch APIs plus minimal live frontend controls on the queue and task detail pages."
+    - "Claimed annotation tasks remain visible in the queue after claim, task create/claim/patch all require Idempotency-Key, and audit persistence is covered by backend tests."
+    - "Risk Alert Operations Completion is now QA-verified with backend-owned risk alert patch and acknowledge APIs plus a thin live management panel on the risk detail page."
+    - "The initial QA blocker on missing Idempotency-Key propagation through the Next.js risk alert proxy routes was fixed, and the browser-to-controller mutation path now stays contract-compliant."
+    - "Release Hardening Track is now QA-verified with controller and web health checks, release Dockerfiles, compose.release.yaml, release smoke and rollback helpers, and aligned release-facing docs."
+    - "The release hardening package is suitable for local release rehearsal and now counts as positive evidence for the approved Release 1 boundary."
+    - "A real Docker daemon rehearsal now passes locally: compose.release.yaml builds successfully, migrate exits 0, postgres/controller/web reach healthy state, and ops/release/smoke.ps1 passes against the running stack."
+    - "Architect has applied a minimal ACR for Project Dataset & Multimodal Item Management E2E, freezing four write-side metadata APIs without introducing upload, batch import, archive/retire, Coze, or workflow-tracking scope."
+    - "The next implementation slice is project-scoped dataset creation and multimodal source-asset registration/update, with source_assets allowed to exist at project scope before optional dataset assignment."
+    - "Project Dataset & Multimodal Item Management E2E is now QA-verified with backend-owned dataset/source-asset metadata create/update APIs, project-scoped optional dataset linkage, audit-backed idempotency, and a live frontend catalog management surface."
+    - "This slice stays intentionally metadata-only and does not widen into upload, batch import, archive/retire, Coze dispatch, or workflow tracking."
+    - "Architect has applied a minimal ACR for Project Member Management Completion, freezing GET/PATCH/DELETE member-management endpoints with soft-delete semantics for DELETE."
+    - "Project Member Management Completion is now QA-verified with live member list, project-scoped role/status updates, soft-delete deactivation, Idempotency-Key enforcement, active-project-manager guardrails, audit persistence, and a thin project overview member-management panel."
+    - "Multimodal Annotation Coverage Completion is now QA-verified with one unified annotation workbench previewing image, audio, and video assets through the backend-owned source-asset access path."
+    - "The existing live annotation loop now has slice-level proof for queue, task detail, ai-generate, submission, review, and workflow drilldown across image, audio, and video without introducing modality-specific annotators."
+    - "Risk Signal Capture Completion is now QA-verified with one shared project risk form exposing two explicit front-end entry points: save signal only and save plus analyze."
+    - "POST /api/v1/projects/{project_id}/risk-signals now persists a signal without workflow dispatch, while POST /api/v1/projects/{project_id}/risk-generate remains the backend-owned unified risk workflow entry."
+    - "Release 1 Final Acceptance Gate is now complete: PM mapped every must-have gate to verified slices, QA confirmed the verified boundary, and release-facing docs were aligned to the same approved scope."
+    - "The Release 1 decision is GO for the approved verified boundary only; broader deferred surfaces remain out of scope and must not be cited as release evidence."
+    - "Formal release execution has now started with a parent-thread-owned execution checklist for freeze, preflight, build, smoke validation, spot check, and rollback control."
+    - "Release preflight has now passed on the current workstation after restoring Docker daemon access, loading the required release environment variables into the shell, and selecting the non-conflicting release port set POSTGRES_PORT=55432, CONTROLLER_PORT=18000, WEB_PORT=13000."
+    - "Release build and smoke validation have now passed on the selected release port set: migrate exited 0, postgres/controller/web are healthy, and ops/release/smoke.ps1 passed against http://127.0.0.1:18000 and http://127.0.0.1:13000."
+    - "Release spot check initially failed because the web runtime was not propagating authorization to controller SSR data fetches in the release stack."
+    - "The SSR auth propagation blocker is now fixed and QA-verified through the server-only CONTROLLER_API_AUTH_TOKEN fallback in apps/web."
+    - "Release execution remains on hold because the release PostgreSQL runtime has no seeded users, memberships, or projects, and /projects still uses mock-backed navigation that can point at project IDs missing from the release controller database."
+  dependencies:
+    fe:
+      requires:
+        - "api_contract_ready"
+        - "design_tokens_ready"
+    be:
+      requires:
+        - "api_contract_ready"
+        - "schema_ready"
+
+agents:
+  pm:
+    status: "release_1_final_acceptance_verified"
+    retries_used: 0
+    owns:
+      - "docs/prd.md"
+      - "docs/roles-and-permissions.md"
+      - "docs/mvp-scope.md"
+  architect:
+    status: "project_member_management_acr_applied"
+    retries_used: 0
+    owns:
+      - "docs/architecture.md"
+      - "docs/schema.md"
+      - "docs/api-contract.md"
+      - "docs/coze-integration.md"
+      - "docs/workflow-run-tracking.md"
+  designer:
+    status: "approved"
+    retries_used: 0
+    owns:
+      - "docs/design-tokens.md"
+      - "docs/information-architecture.md"
+  fe:
+    status: "release_runtime_ssr_auth_fallback_verified"
+    retries_used: 0
+    max_retries: 3
+  be:
+    status: "risk_signal_capture_verified"
+    retries_used: 0
+    max_retries: 3
+  qa:
+    status: "release_runtime_ssr_auth_fallback_verified"
+    retries_used: 0
+  general:
+    status: "release_1_final_acceptance_verified"
+    retries_used: 0
+
+documents:
+  prd:
+    path: "docs/prd.md"
+    owner: "pm"
+    status: "approved"
+  roles_permissions:
+    path: "docs/roles-and-permissions.md"
+    owner: "pm"
+    status: "approved"
+  mvp_scope:
+    path: "docs/mvp-scope.md"
+    owner: "pm"
+    status: "release_1_approved_boundary"
+  architecture:
+    path: "docs/architecture.md"
+    owner: "architect"
+    status: "approved"
+  information_architecture:
+    path: "docs/information-architecture.md"
+    owner: "designer"
+    status: "approved"
+  schema:
+    path: "docs/schema.md"
+    owner: "architect"
+    status: "approved"
+  api_contract:
+    path: "docs/api-contract.md"
+    owner: "architect"
+    status: "approved"
+  coze_integration:
+    path: "docs/coze-integration.md"
+    owner: "architect"
+    status: "approved"
+  workflow_run_tracking:
+    path: "docs/workflow-run-tracking.md"
+    owner: "architect"
+    status: "approved"
+  rbac_proposal:
+    path: "docs/rbac-proposal.md"
+    owner: "architect"
+    status: "approved"
+  implementation_plan:
+    path: "docs/implementation-plan.md"
+    owner: "orchestrator"
+    status: "approved"
+  release_execution_checklist:
+    path: "docs/release-execution-checklist.md"
+    owner: "orchestrator"
+    status: "spot_check_blocked_by_seed_data"
+  design_tokens:
+    path: "docs/design-tokens.md"
+    owner: "designer"
+    status: "approved"
+  page_list:
+    path: "docs/page-list.md"
+    owner: "designer"
+    status: "approved"
+  ui_flows:
+    path: "docs/ui-flows.md"
+    owner: "designer"
+    status: "approved"
+  frontend_stack:
+    path: "docs/decisions/frontend-stack.md"
+    owner: "orchestrator"
+    status: "approved"
+  backend_stack:
+    path: "docs/decisions/backend-stack.md"
+    owner: "orchestrator"
+    status: "approved"
+  qa_report:
+    path: "docs/qa-report.md"
+    owner: "qa"
+    status: "release_1_final_acceptance_verified"
+  release_gate:
+    path: "docs/release-gate.md"
+    owner: "general"
+    status: "go"
+  release:
+    path: "docs/release.md"
+    owner: "general"
+    status: "release_1_ready"
+  readme:
+    path: "README.md"
+    owner: "general"
+    status: "release_hardening_ready"
+  deployment:
+    path: "docs/deployment.md"
+    owner: "general"
+    status: "release_hardening_ready"
+  handoff:
+    path: "docs/handoff.md"
+    owner: "general"
+    status: "release_1_ready"
+  observability:
+    path: "docs/observability.md"
+    owner: "general"
+    status: "release_hardening_ready"
+
+controls:
+  api_contract:
+    owner: "architect"
+    fe_can_edit: false
+    be_can_edit: false
+    change_process: "FE or BE must escalate to the Orchestrator; architect updates the contract after approval."
+  blackboard:
+    writable_by: ["parent-thread"]
+  retries:
+    fe: 3
+    be: 3

@@ -1,0 +1,12 @@
+name = "qa"
+role = "Quality Assurance"
+description = "Validates implemented behavior against the PRD, architecture, and approved contract."
+skill = ".agents/skills/qa.md"
+shared_skill = ".agents/skills/shared-policy.md"
+entry_gate = "implementation_complete"
+exit_gate = "qa_passed"
+reads = ["AGENTS.md", ".codex/config.toml", "docs/blackboard/state.yaml", "docs/prd.md", "docs/architecture.md", "docs/schema.md", "docs/api-contract.md", "docs/design-tokens.md"]
+writes = ["docs/qa-report.md"]
+forbidden_writes = ["docs/blackboard/state.yaml", "docs/prd.md", "docs/api-contract.md"]
+handoff_targets = ["general", "orchestrator"]
+deliverables = ["Test evidence", "Risk summary", "Release recommendation"]

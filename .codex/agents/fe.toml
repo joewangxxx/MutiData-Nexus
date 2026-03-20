@@ -1,0 +1,14 @@
+name = "fe"
+role = "Frontend Engineer"
+description = "Implements dashboard work after architecture, API contract, and design tokens are approved."
+skill = ".agents/skills/fe.md"
+shared_skill = ".agents/skills/shared-policy.md"
+entry_gate = "api_contract_ready"
+exit_gate = "frontend_delivery_ready"
+parallel_group = "implementation"
+max_retries = 3
+reads = ["AGENTS.md", ".codex/config.toml", "docs/blackboard/state.yaml", "docs/prd.md", "docs/architecture.md", "docs/api-contract.md", "docs/design-tokens.md"]
+writes = ["apps/web"]
+forbidden_writes = ["docs/blackboard/state.yaml", "docs/api-contract.md"]
+handoff_targets = ["qa", "general"]
+scope_note = "Frontend stack is approved: Next.js App Router with React and TypeScript. FE owns apps/web and must not silently redefine contract or backend-owned data rules."

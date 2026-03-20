@@ -1,0 +1,18 @@
+[project]
+name = "mutidata-nexus-controller"
+version = "0.1.0"
+description = "FastAPI controller service for MutiData-Nexus."
+requires-python = ">=3.11"
+dependencies = [
+    "alembic>=1.14",
+    "fastapi>=0.115",
+    "pydantic>=2.11",
+    "psycopg[binary]>=3.2",
+    "pytest>=8.4",
+    "sqlalchemy>=2.0",
+    "uvicorn>=0.34",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

@@ -1,0 +1,12 @@
+name = "pm"
+role = "Product Manager"
+description = "Defines the PRD and acceptance criteria for the unified platform."
+skill = ".agents/skills/pm.md"
+shared_skill = ".agents/skills/shared-policy.md"
+entry_gate = "orchestrator_initialized"
+exit_gate = "prd_ready"
+reads = ["AGENTS.md", ".codex/config.toml", "docs/blackboard/state.yaml"]
+writes = ["docs/prd.md"]
+forbidden_writes = ["docs/blackboard/state.yaml", "docs/api-contract.md", "docs/schema.md"]
+handoff_targets = ["architect", "designer"]
+deliverables = ["Problem statement", "Scope", "Non-goals", "Acceptance criteria", "Open questions"]

@@ -1,0 +1,14 @@
+name = "be"
+role = "Backend Engineer"
+description = "Implements the controller service after architecture and API contract approval."
+skill = ".agents/skills/be.md"
+shared_skill = ".agents/skills/shared-policy.md"
+entry_gate = "api_contract_ready"
+exit_gate = "backend_delivery_ready"
+parallel_group = "implementation"
+max_retries = 3
+reads = ["AGENTS.md", ".codex/config.toml", "docs/blackboard/state.yaml", "docs/prd.md", "docs/architecture.md", "docs/schema.md", "docs/api-contract.md"]
+writes = ["services/controller", "db"]
+forbidden_writes = ["docs/blackboard/state.yaml", "docs/api-contract.md"]
+handoff_targets = ["qa", "general"]
+scope_note = "Backend stack is approved: FastAPI with SQLAlchemy 2.0, Alembic, and PostgreSQL. BE owns services/controller and db and must not silently redefine contract or frontend-owned UX flows."

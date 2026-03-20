@@ -1,0 +1,100 @@
+version = 1
+
+[project]
+name = "MutiData-Nexus"
+mode = "orchestrated-multi-agent"
+orchestrator = "parent-thread"
+goal = "Unify multimodal data annotation and project risk monitoring into one AI data operations platform."
+
+[paths]
+blackboard = "docs/blackboard/state.yaml"
+docs = "docs"
+agent_configs = ".codex/agents"
+agent_skills = ".agents/skills"
+
+[platform]
+frontend = "React with Next.js dashboard"
+backend = "FastAPI control plane"
+database = "PostgreSQL"
+ai_execution_engine = "Coze API"
+
+[policies]
+blackboard_writer = "orchestrator-only"
+prd_owner = "pm"
+architecture_owner = "architect"
+schema_owner = "architect"
+api_contract_owner = "architect"
+design_tokens_owner = "designer"
+qa_report_owner = "qa"
+release_docs_owner = "general"
+require_api_contract_before_parallel_fe_be = true
+fe_may_edit_api_contract = false
+be_may_edit_api_contract = false
+fe_max_retries = 3
+be_max_retries = 3
+allow_feature_implementation = true
+
+[docs]
+prd = "docs/prd.md"
+roles_permissions = "docs/roles-and-permissions.md"
+mvp_scope = "docs/mvp-scope.md"
+architecture = "docs/architecture.md"
+information_architecture = "docs/information-architecture.md"
+schema = "docs/schema.md"
+api_contract = "docs/api-contract.md"
+coze_integration = "docs/coze-integration.md"
+workflow_run_tracking = "docs/workflow-run-tracking.md"
+rbac_proposal = "docs/rbac-proposal.md"
+implementation_plan = "docs/implementation-plan.md"
+design_tokens = "docs/design-tokens.md"
+page_list = "docs/page-list.md"
+ui_flows = "docs/ui-flows.md"
+frontend_stack = "docs/decisions/frontend-stack.md"
+backend_stack = "docs/decisions/backend-stack.md"
+qa_report = "docs/qa-report.md"
+release = "docs/release.md"
+deployment = "docs/deployment.md"
+handoff = "docs/handoff.md"
+readme = "README.md"
+
+[workflow]
+stages = ["prd", "architecture", "design", "implementation", "qa", "release"]
+parallel_implementation_gate = "api_contract_ready"
+implementation_agents = ["fe", "be"]
+qa_gate = "implementation_complete"
+release_gate = "qa_passed"
+
+[[agents]]
+name = "pm"
+config = ".codex/agents/pm.toml"
+skill = ".agents/skills/pm.md"
+
+[[agents]]
+name = "architect"
+config = ".codex/agents/architect.toml"
+skill = ".agents/skills/architect.md"
+
+[[agents]]
+name = "designer"
+config = ".codex/agents/designer.toml"
+skill = ".agents/skills/designer.md"
+
+[[agents]]
+name = "fe"
+config = ".codex/agents/fe.toml"
+skill = ".agents/skills/fe.md"
+
+[[agents]]
+name = "be"
+config = ".codex/agents/be.toml"
+skill = ".agents/skills/be.md"
+
+[[agents]]
+name = "qa"
+config = ".codex/agents/qa.toml"
+skill = ".agents/skills/qa.md"
+
+[[agents]]
+name = "general"
+config = ".codex/agents/general.toml"
+skill = ".agents/skills/general.md"

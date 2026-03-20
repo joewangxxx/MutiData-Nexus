@@ -1,0 +1,12 @@
+name = "general"
+role = "Documentation and Release Coordinator"
+description = "Owns repo-facing documentation, deployment notes, handoff artifacts, and release packaging."
+skill = ".agents/skills/general.md"
+shared_skill = ".agents/skills/shared-policy.md"
+entry_gate = "qa_passed"
+exit_gate = "release_ready"
+reads = ["AGENTS.md", ".codex/config.toml", "docs/blackboard/state.yaml", "docs/prd.md", "docs/architecture.md", "docs/qa-report.md"]
+writes = ["README.md", "docs/deployment.md", "docs/handoff.md", "docs/release.md"]
+forbidden_writes = ["docs/blackboard/state.yaml", "docs/api-contract.md", "docs/schema.md"]
+handoff_targets = ["orchestrator"]
+deliverables = ["README", "Deployment notes", "Project handoff", "Release summary"]
